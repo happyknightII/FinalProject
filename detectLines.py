@@ -36,6 +36,7 @@ def apply_brightness_contrast(input_img, brightness=0, contrast=0):
 
 
 def detect_lines(src, min_line_length, max_line_gap):
+    img = np.copy(src)
     blurred_img = cv2.GaussianBlur(src, blur, 2)
     bright_img = apply_brightness_contrast(blurred_img, brightness, contrast)
     grey_img = cv2.cvtColor(bright_img, cv2.COLOR_BGR2GRAY)
@@ -54,8 +55,7 @@ def detect_lines(src, min_line_length, max_line_gap):
                 else:
                     angle = np.arctan2(abs(y2 - y1), abs(x2 - x1)) / np.pi * 180
                     if angle > 55:
-                        cv2.line(bright_img, (x1, y1),
-                                 (x2, y2), (255, 0, 0), 5)
+
                         num_lines += 1
                         accepted_lines.append(angle)
     return num_lines, np.median(accepted_lines)

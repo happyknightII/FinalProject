@@ -25,7 +25,7 @@ class ImageCropper:
         pts2 = np.float32(((0, 0), (self.shape[0], 0), (0, self.shape[1]), (self.shape[0], self.shape[1])))
         matrix = cv2.getPerspectiveTransform(pts1, pts2)
 
-        return cv2.warpPerspective(src, matrix, (self.shape[0], self.shape[1]))
+        return np.copy(cv2.warpPerspective(src, matrix, (self.shape[0], self.shape[1])))
 
     def display_crop_lines(self, src):
         for pts in self.warpPoints:

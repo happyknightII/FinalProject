@@ -7,7 +7,7 @@ from detectLines import detect_lines
 
 
 SLIDER_BACKGROUND_WEIGHT = 0.4
-SLIDER_FOREGROUND_WEIGHT = 0.8
+SLIDER_FOREGROUND_WEIGHT = 0.6
 font = cv2.FONT_HERSHEY_SIMPLEX
 risk_y = 1000
 confidence_x = 100
@@ -20,11 +20,9 @@ save = cv2.VideoWriter("output.mp4", cv2.VideoWriter_fourcc(*'MP4V'), 30, (1920,
 a = 0.3
 b = 6
 while True:
-
     ret, frame = video.read()
     if ret:
         image = imageCropper.crop_image(frame)
-
         warpedImage = imageCropper.warp_image(image)
         detected = detect_lines(warpedImage, 30, 15)
         risk = 90 - detected[1]
@@ -44,22 +42,22 @@ while True:
                  (200, 200, 200), 25)
         cv2.line(slider_background, (display_offset, risk_y), risk_pos, (0, 255, adjusted_risk), 25)
         cv2.circle(slider_foreground, risk_pos, 30, (0, 255, adjusted_risk), -1)
+
+        confidence_pos = (confidence_x, frame.shape[0] - display_offset - detected[0] * 7)
         cv2.line(slider_background, (confidence_x, display_offset),
                  (confidence_x, frame.shape[0] - display_offset),
                  (200, 200, 200), 25)
-
-        confidence_pos = (confidence_x, frame.shape[0] - display_offset - detected[0] * 7)
         cv2.line(slider_foreground, confidence_pos,
                  (confidence_x, frame.shape[0] - display_offset),
                  (255, 0, 0), 25)
         cv2.circle(slider_foreground, confidence_pos, 30, (255, 0, 0), -1)
         cv2.putText(slider_foreground, str(detected[0]), confidence_pos, font, 5, (0, 0, 0), 15)
         cv2.putText(slider_foreground, str(detected[0]), confidence_pos, font, 5, (255, 255, 255), 10)
-
         out = cv2.addWeighted(cv2.addWeighted(
-            frame, 1,
-            slider_background, SLIDER_BACKGROUND_WEIGHT, 1), 1,
-            slider_foreground, SLIDER_FOREGROUND_WEIGHT, 1)
+            frame, 1 - SLIDER_BACKGROUND_WEIGHT,
+            slider_background, SLIDER_BACKGROUND_WEIGHT, 0), 1 - SLIDER_FOREGROUND_WEIGHT,
+            slider_foreground, SLIDER_FOREGROUND_WEIGHT, 0)
+
         cv2.imshow('Result',
                    cv2.resize(out, (int(frame.shape[1] * RESIZE_FACTOR), int(frame.shape[0] * RESIZE_FACTOR))))
         save.write(out)

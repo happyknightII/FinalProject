@@ -18,7 +18,7 @@ line_medians = []
 video = cv2.VideoCapture("3686.mp4")
 save = cv2.VideoWriter("output.mp4", cv2.VideoWriter_fourcc(*'MP4V'), 30, (1920, 1080))
 a = 0.3
-b = 5
+b = 6
 while True:
 
     ret, frame = video.read()
@@ -28,7 +28,10 @@ while True:
         warpedImage = imageCropper.warp_image(image)
         detected = detect_lines(warpedImage, 30, 15)
         risk = 90 - detected[1]
-        line_medians.append(a * risk ** 2 + b * risk)
+        exp_risk = a * risk ** 2 + b * risk - 50
+        if exp_risk < 0:
+            exp_risk = 0
+        line_medians.append(exp_risk)
 
         adjusted_risk = int(exponential_moving_average(np.array(line_medians), 5))
         slider_background = np.copy(frame)
